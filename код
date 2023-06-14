@@ -1,0 +1,500 @@
+import java.lang.String;
+import java.lang.reflect.Array;
+import java.nio.Buffer;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static java.lang.Math.*;
+
+class func {
+
+    public static int[][] mass_in(int i) {          // инициализация массива
+        // 1 - прямоуг. матрица
+        // 2 - квадр. матрица
+        Scanner in = new Scanner(System.in);
+
+        if (i == 1) {
+            System.out.println("Введите размерность матрицы:");
+            System.out.print("m (строк)    = ");
+            int m = in.nextInt();
+            System.out.print("n (столбцов) = ");
+            int n = in.nextInt();
+            int[][] mass = new int[m][n];
+            return mass;
+        } else {
+            System.out.println("Введите размерность квадратной матрицы:");
+            System.out.print("n = ");
+            int n = in.nextInt();
+            int[][] mass = new int[n][n];
+            return mass;
+        }
+    }
+
+    public static int[][] mass_enter(int[][] mass) {  // ручной ввод массива
+        // ввод - пустой массив нужной размерности
+        Scanner in = new Scanner(System.in);
+        System.out.printf("(ручной ввод массива %d*%d)\n", mass.length, mass[0].length);
+        for (int i = 0; i < mass.length; i++) {
+            System.out.printf("%d строка: \n", i + 1);
+            for (int j = 0; j < mass[0].length; j++) {
+                System.out.printf("x_%d = ", j + 1);
+                mass[i][j] = in.nextInt();
+            }
+        }
+        return mass;
+    }
+
+    public static void mass_out(int[][] mass) { // форматированный вывод массива (sp - промежуток между числами
+
+        int[][] mass_spase = new int[mass.length][mass[0].length];
+        int k_last = 0, k_first = 1, k;
+        int x;
+        // определение позиций элемента в списке (для форматирования)
+        for (int m = 0; m < mass.length; m++) {
+            for (int n = 0; n < mass[0].length; n++) {
+                x = abs((int) (mass[m][n] % 1 * 1000));
+                k = 3;
+                for (int i = 2; i >= 0; i--) {
+                    if (x / stepen(10, i) > 0) {
+                        k = i;
+                    }
+                }
+                mass_spase[m][n] = 3 - k;
+                k_last = max(3 - k, k_last);
+
+                x = abs((int) mass[m][n]);
+                k = 0;
+                if (x == 0) {
+                    k++;
+                }
+                while (x > 0) {
+                    k++;
+                    x /= 10;
+                }
+                mass_spase[m][n] += k * 10;
+                k_first = max(k, k_first);
+            }
+        }
+        // форматированный вывод результатов
+        for (int m = 0; m < mass.length; m++) {
+            for (int n = 0; n < mass[0].length; n++) {
+                if (mass[m][n] >= 0) {
+                    System.out.print(" ");
+                }
+                for (int i = 0; i < k_first - mass_spase[m][n] / 10; i++) {
+                    System.out.print(" ");
+                }
+                if (mass_spase[m][n] % 10 == 0) {
+                    System.out.print((int) mass[m][n]);
+                    System.out.print(" ");
+                } else {
+                    System.out.printf("%." + mass_spase[m][n] % 10 + "f", mass[m][n]);
+                }
+                for (int i = 0; i < k_last - mass_spase[m][n] % 10 + 1; i++) {
+                    System.out.print(" ");
+                }
+            }
+            System.out.println();
+        }
+    }
+
+    public static int stepen(int x, int n) {
+        int sum = 1;
+        for (int i = 0; i < n; i++) {
+            sum = sum * x;
+        }
+        return sum;
+    }
+    public static boolean num2_1(int x, int n) {
+        // является ли число n-ричным?
+
+        for (int i = 1; i <= 10; i++) {
+            if (x % 10 >= n) {
+                return false;
+            }
+            x /= 10;
+        }
+        return true;
+    }
+
+    public static int[] num2_2(int x) {
+        // перевод int в массив
+
+        int x_i = 1, S = 1;
+        while (true) {
+            for (int i = 0; i < x_i - 1; i++) {
+                S = S * 10;
+            }
+            if (S >= x) {
+                break;
+            } else {
+                x_i += 1;
+            }
+        }
+
+        int[] mass = new int[x_i];
+        for (int i = 0; i < x_i; i++) {
+            mass[x_i - i - 1] = x % 10;
+            x /= 10;
+        }
+        return mass;
+    }
+
+    public static int[] num2_3(int[] mass, int N_1, int N_2) {
+        // перевод массива из любой СС (массив) в любую СС (массив)
+
+        int S = 0;
+        for (int i = 0; i < mass.length; i++) {
+            S += mass[mass.length - 1 - i] * stepen(N_1, i);
+        }
+
+        int x_i = 1, x = 1;
+        while (true) {
+            x *= N_2;
+            if (x >= S) {
+                break;
+            } else {
+                x_i += 1;
+            }
+        }
+
+        int[] mass_new = new int[x_i];
+        for (int i = x_i - 1; i >= 0; i--) {
+            mass_new[i] = S % N_2;
+            S /= N_2;
+        }
+
+        return mass_new;
+    }
+}
+
+class Work_is_start {    // вариант 12
+
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+
+        String S, S1;
+        char[] array_s;
+        int x_i, i_i, n_i, y_i, t_i, k_i;
+        double x_d, y_d, r_d;
+        char l, s_copy, ch;
+        String s, str;
+        boolean flag = false;
+
+
+        int num;
+        while (true) {
+            System.out.println("___Введите номер задачи от 1 до 12___");
+            num = in.nextInt();
+
+            flag = false;
+            switch (num) {
+                case 1:
+                    System.out.println("Введите массив симоволов: ");
+                    in.nextLine();
+                    S = in.nextLine();
+                    array_s = S.toCharArray();
+
+                    for (int i = 0; i < array_s.length; i++) {
+                        if (Character.isLowerCase(array_s[i])) {
+                            array_s[i] = Character.toUpperCase(array_s[i]);
+                        } else if (Character.isUpperCase(array_s[i])) {
+                            array_s[i] = Character.toLowerCase(array_s[i]);
+                        } else if (Character.isDigit(array_s[i])) {
+                            array_s[i] = '!';
+                        }
+                        System.out.println(array_s[i]);
+                    }
+                    break;
+                case 2:
+                    while (true) {
+                        System.out.println("Введите массив: ");
+                        in.nextLine();
+                        s = in.nextLine();
+                        String s_new = "";
+                        array_s = s.toCharArray();
+                        for (int i = 0; i < array_s.length; i++) {
+                            if (Character.isDigit(array_s[i])) {
+                                s_new += array_s[i];
+                                flag = true;
+                            } else if (flag) {
+                                break;
+                            }
+                        }
+                        x_i = Integer.parseInt(s_new);
+                        if (flag && func.num2_1(x_i, 8)) {
+                            break;
+                        } else {
+                            System.out.println("Число введено неверно.");
+                        }
+                    }
+                    System.out.println(Arrays.toString(func.num2_3(func.num2_2(x_i), 10, 2)));
+                    break;
+
+                case 3:
+                    System.out.println("Сколько элементов в массиве?");
+                    n_i = in.nextInt();
+                    char[] mass = new char[n_i];
+                    System.out.println("Введите элементы массива: ");
+                    in.nextLine();
+                    for (int i = 0; i < n_i; i++) {
+                        System.out.print(i+1 + ") ");
+                        mass[i] = in.nextLine().charAt(0);
+                    }
+                    System.out.println("Ответ: ");
+                    x_i = 1;
+                    for (int i = 0; i < n_i; i++) {
+                        if ((int) mass[i] >= 97 && (int) mass[i] >= 122) {
+                            x_i += 1;
+                        }
+                    }
+                    System.out.println("a) " + x_i);
+
+                    System.out.print("Введите слово для пункта (б): ");
+                    s = in.nextLine();
+                    k_i = 0;
+                    ch = ' ';
+                    for (int i = 0; i < s.length(); i++) {
+                        for (int j = 0; j < mass.length; j++) {
+                            if (s.charAt(i) == mass[j]) {
+                                ch = s.charAt(i);
+                                k_i += 1;
+                            }
+                        }
+                        if (ch != ' ') {
+                            break;
+                        }
+                    }
+                    if (ch != ' ') {
+                        System.out.println("б) символ (" + ch + ") встречался " + k_i + " раз");
+                    } else {
+                        System.out.println("б) Не встречано данных символов");
+                    }
+
+                    flag = false;
+                    for (int j = 0; j < mass.length; j++) {
+                        if (mass[j] == 44 || mass[j] == 46) {
+                            flag = true;
+                        }
+                    }
+                    if (flag) {
+                        System.out.println("в) верно");
+                    } else {
+                        System.out.println("в) Не верно");
+                    }
+
+                    flag = false;
+                    for (int j = 0; j < mass.length - 1; j++) {
+                        if ((mass[j] == '(' || mass[j] == '{' || mass[j] == '[')
+                                && (mass[j+1] == ')' || mass[j+1] == '}' || mass[j+1] == ']')) {
+                            flag = true;
+                        }
+                    }
+                    if (flag) {
+                        System.out.println("г) такие пары имеются");
+                    } else {
+                        System.out.println("г) такие пары НЕ имеются");
+                    }
+
+                    str = ".?!:;,-()";
+                    flag = false;
+                    for (int j = 0; j < mass.length - 1; j++) {
+                        for (int i = 0; i < str.length(); i++) {
+                            if (mass[j] == str.charAt(i) && mass[j+1] == str.charAt(i)) {
+                                flag = true;
+                            }
+                        }
+                    }
+                    if (flag) {
+                        System.out.println("д) такие пары имеются");
+                    } else {
+                        System.out.println("д) такие пары НЕ имеются");
+                    }
+                    break;
+                case 4:
+                    ArrayList<String> list = new ArrayList<>();
+                    list.add("cos(");
+                    list.add("x");
+                    list.add(") - sin(");
+                    list.add("y");
+                    list.add(") = ");
+                    list.add("z");
+                    System.out.println(list.toString());
+                    System.out.println("Скорроктируйте параметры x, y, z:");
+                    in.nextLine();
+                    System.out.print("x = ");
+                    list.set(1, in.nextLine());
+                    System.out.print("y = ");
+                    list.set(3, in.nextLine());
+                    System.out.print("z = ");
+                    list.set(5, in.nextLine());
+                    System.out.println(list.toString());
+                    break;
+                case 5:
+                    System.out.println("Введите текст: ");
+                    in.nextLine();
+                    s = in.nextLine();
+
+                    str = ".?!:;,-()";
+                    for (int i = 0; i < str.length(); i++) {
+                        s.replaceAll("str.charAt(i)", " ");
+                    }
+
+                    List<String> list_1 = Arrays.asList(s.split(" "));
+                    for (int i = 0; i < list_1.size(); i++) {
+                        list_1.set(i, list_1.get(i).toLowerCase());
+                    }
+
+                    Set<String> uniqueWords = new HashSet<String>(list_1);
+                    for (String word : uniqueWords) {
+                        if (Collections.frequency(list_1, word) >= 2 && word.equals("") == false) {
+                            System.out.println(word + ": " + Collections.frequency(list_1, word));
+                        }
+                    }
+
+                    break;
+                case 7:
+                    System.out.println("Введите текст: ");
+                    in.nextLine();
+                    s = in.nextLine();
+                    List<String> list_2 = Arrays.asList(s.split(" "));
+                    List<String> list_2_1 = new ArrayList<>();
+                    for (int i = 0; i < list_2.size(); i++) {
+                        for (int j = 0; j < list_2.get(i).length(); j++) {
+                            if (    (list_2.get(i).charAt(j) >= 'А' && list_2.get(i).charAt(j) <= 'Я') ||
+                                    (list_2.get(i).charAt(j) >= 'а' && list_2.get(i).charAt(j) <= 'я')   )  {
+                                list_2_1.add(list_2.get(i));
+                                break;
+                            }
+                        }
+                    }
+                    Collections.reverse(list_2_1);
+                    System.out.println(list_2_1);
+                    break;
+                case 8:
+                    System.out.println("Введите текст: ");
+                    in.nextLine();
+                    s = in.nextLine();
+                    List<String> list_3 = Arrays.asList(s.split(" "));
+                    for (int i = 0; i < list_3.size(); i++) {
+                        flag = false;
+                        for (int j = 1; j < list_3.get(i).length(); j++) {
+                            if (list_3.get(i).charAt(j) >= 'A' && list_3.get(i).charAt(j) <= 'Z' && list_3.get(i).charAt(j - 1) != ' ' && list_3.get(i).charAt(j - 1) != '_') {
+                                list_3.set(i, list_3.get(i).substring(0, j) + "_" + list_3.get(i).substring(j));
+                                flag = true;
+                            }
+                        }
+                        if (flag) {
+                            list_3.set(i, list_3.get(i).toLowerCase());
+                        }
+                    }
+                    s = "";
+                    for (int i = 0; i < list_3.size(); i++) {
+                        s += list_3.get(i) + " ";
+                    }
+                    System.out.println(s);
+                    break;
+                case 9:
+                    System.out.println("Введите текст: ");
+                    in.nextLine();
+                    s = in.nextLine();
+                    flag = false;
+                    x_i = 0;
+                    for (int j = 0; j < s.length(); j++) {
+                        for (int i = 0; i < s.length(); i++) {
+                            if (s.charAt(i) == '/' && flag == false) {
+                                flag = true;
+                                x_i = i;
+                            } else if (s.charAt(i) == '/' && flag == true) {
+                                s = s.substring(0, x_i) + s.substring(i + 1, s.length());
+                                flag = false;
+                                i = x_i - 1;
+                            }
+                        }
+                    }
+                    for (int j = 0; j < s.length(); j++) {
+                        for (int i = 0; i < s.length(); i++) {
+                            if (s.charAt(i) == '|' && flag == false) {
+                                flag = true;
+                                x_i = i;
+                            } else if (s.charAt(i) == '|' && flag == true) {
+                                s = s.substring(0, x_i) + s.substring(i + 1, s.length());
+                                flag = false;
+                                i = x_i - 1;
+                            }
+                        }
+                    }
+
+                    System.out.println(s);
+                    break;
+                case 10:
+                    System.out.println("Введите текст: ");
+                    in.nextLine();
+                    s = in.nextLine();
+                    s = s.replaceAll(":", ";");
+                    x_i = 0;
+                    for (int i = 0; i < s.length(); i++) {
+                        if (s.charAt(i) == '.') {
+                            x_i += 1;
+                        }
+                    }
+                    String[] s_1 = s.split("\\.");
+                    String[][] s_2 = new String[x_i][11];
+                    for (int i = 0; i < x_i; i++) {
+                        s_2[i] = s_1[i].split(";");
+                    }
+
+                    System.out.println("Люди c номерами ...912... или ...919... и ...5:");
+                    x_i = 0;
+                    for (int i = 0; i < s_2.length; i++) {
+                        s_2[i][8] = s_2[i][8].replaceAll(" ", "");
+                        if ((s_2[i][8].indexOf("912") > -1 || s_2[i][8].indexOf("919") > -1)
+                                && s_2[i][8].charAt(s_2[i][8].length() - 1) == '5') {
+                            x_i++;
+                        }
+                    }
+                    System.out.println(x_i);
+
+                    System.out.println("Ученики 5-х классов: ");
+                    for (int i = 0; i < s_2.length; i++) {
+                        if (s_2[i][11].indexOf("5") > 0) {
+                            System.out.println(Arrays.toString(s_2[i]));
+                        }
+                    }
+                    break;
+                case 11:
+                    System.out.println("Введите email или десятичное число или абривеатуру факультета: ");
+                    in.nextLine();
+                    s = in.nextLine();
+
+                    Pattern pt = Pattern.compile("\\w+@\\w+\\.(ru||com)");
+                    Matcher m_1 = pt.matcher(s);
+                    if (m_1.matches()) {
+                        System.out.println("Вы ввели имейл");
+                    }
+
+                    pt = Pattern.compile("(\\d\\.\\d||\\d,\\d)");
+                    m_1 = pt.matcher(s);
+                    if (m_1.matches()) {
+                        System.out.println("Вы ввели десятичное число");
+                    }
+
+                    pt = Pattern.compile("[А-Я]");
+                    m_1 = pt.matcher(s);
+                    if (m_1.matches()) {
+                        System.out.println("Вы ввели абривеатуру факультета");
+                    }
+                    break;
+                case 12:
+                    System.out.println("Не понял формулироваку задания");
+                    break;
+                default:
+                    System.out.println("Вы ввели неверный номер задания");
+            }
+            System.out.println();
+        }
+
+
+    }
+}
